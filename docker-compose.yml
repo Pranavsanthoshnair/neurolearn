@@ -1,0 +1,73 @@
+version: "3.9"
+
+# NeuroLearn AI - Docker Compose
+# Runs backend + (optional) Redis for rate limiting in one command:
+#   docker-compose up --build
+
+services:
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neurolearn-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FIREBASE_CREDENTIALS_PATH=/app/firebase-adminsdk.json
+      - ENVIRONMENT=development
+      - PORT=8000
+    volumes:
+      # Mount Firebase credentials from host
+      - ./backend/firebase-adminsdk.json:/app/firebase-adminsdk.json:ro
+      # Mount source for hot-reload in development
+      - ./backend:/app
+      # Persist downloaded HuggingFace model cache
+      - hf_cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - neurolearn-net
+
+  # ── React Frontend (dev server) ──────────────────────────────────────────────
+  frontend:
+    image: node:20-alpine
+    container_name: neurolearn-frontend
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_FIREBASE_API_KEY=${REACT_APP_FIREBASE_API_KEY}
+      - REACT_APP_FIREBASE_AUTH_DOMAIN=${REACT_APP_FIREBASE_AUTH_DOMAIN}
+      - REACT_APP_FIREBASE_PROJECT_ID=${REACT_APP_FIREBASE_PROJECT_ID}
+      - REACT_APP_FIREBASE_STORAGE_BUCKET=${REACT_APP_FIREBASE_STORAGE_BUCKET}
+      - REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${REACT_APP_FIREBASE_MESSAGING_SENDER_ID}
+      - REACT_APP_FIREBASE_APP_ID=${REACT_APP_FIREBASE_APP_ID}
+      - CHOKIDAR_USEPOLLING=true   # Required for hot-reload inside Docker
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules           # Isolate node_modules inside container
+    command: sh -c "npm install && npm start"
+    depends_on:
+      - backend
+    networks:
+      - neurolearn-net
+
+# ── Volumes ─────────────────────────────────────────────────────────────────────
+volumes:
+  hf_cache:
+    driver: local
+
+# ── Networks ────────────────────────────────────────────────────────────────────
+networks:
+  neurolearn-net:
+    driver: bridge

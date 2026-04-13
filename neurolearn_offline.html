@@ -1,0 +1,374 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#app{max-width:720px;margin:0 auto;padding:1.25rem 1rem;font-family:var(--font-sans)}
+h1{font-size:21px;font-weight:500;color:var(--color-text-primary);text-align:center}
+.sub{font-size:13px;color:var(--color-text-secondary);text-align:center;margin-top:3px;margin-bottom:1.25rem}
+.offline-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459;margin:0 auto 1rem;display:flex;width:fit-content}
+.dot-g{width:7px;height:7px;border-radius:50%;background:#639922}
+.tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.25rem}
+.tab{padding:9px 20px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px;user-select:none}
+.tab.active{color:#534AB7;border-bottom-color:#534AB7;font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.mpills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.mp{font-size:12px;padding:5px 13px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;user-select:none}
+.mp.on{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489;font-weight:500}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.chip{font-size:12px;padding:4px 11px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer}
+.chip:hover{border-color:#AFA9EC;color:#3C3489}
+.chat-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);min-height:280px;max-height:400px;overflow-y:auto;padding:1rem;margin-bottom:.9rem;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:90%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.75;word-break:break-word;white-space:pre-wrap}
+.msg.user{align-self:flex-end;background:#EEEDFE;color:#3C3489;border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);border-bottom-left-radius:4px}
+.irow{display:flex;gap:8px;margin-bottom:.5rem}
+.irow textarea{flex:1;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:9px 12px;font-size:13px;font-family:var(--font-sans);color:var(--color-text-primary);background:var(--color-background-primary);resize:none;height:56px;line-height:1.5}
+.irow textarea:focus{outline:none;border-color:#AFA9EC}
+.sbtn{padding:0 18px;border-radius:var(--border-radius-md);border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.sbtn:hover{background:#CECBF6}
+.hint{font-size:11px;color:var(--color-text-tertiary);margin-bottom:.5rem}
+.drop-zone{border:1.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:2rem;text-align:center;cursor:pointer;background:var(--color-background-secondary);transition:all .15s;margin-bottom:1rem}
+.drop-zone:hover,.drop-zone.drag{border-color:#7F77DD;background:#EEEDFE}
+.dico{font-size:28px;margin-bottom:6px}
+.drop-zone p{font-size:14px;color:var(--color-text-secondary)}
+.drop-zone small{font-size:12px;color:var(--color-text-tertiary)}
+#imgInput{display:none}
+.prev-wrap{display:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem}
+.prev-wrap img{width:100%;max-height:220px;object-fit:contain;display:block;background:var(--color-background-secondary)}
+.prev-bar{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-top:0.5px solid var(--color-border-tertiary)}
+.prev-bar span{font-size:12px;color:var(--color-text-secondary)}
+.prev-bar button{font-size:12px;color:var(--color-text-danger);background:none;border:none;cursor:pointer}
+.ocr-btn{width:100%;padding:10px;border-radius:var(--border-radius-md);border:0.5px solid #AFA9EC;background:#EEEDFE;color:#3C3489;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:1rem}
+.ocr-btn:hover{background:#CECBF6}
+.ocr-btn:disabled{opacity:.45;cursor:not-allowed}
+.result-wrap{display:none;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem}
+.result-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.result-head span{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.result-head button{font-size:12px;padding:3px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.result-body{padding:1rem;font-size:13px;line-height:1.8;color:var(--color-text-primary);font-family:var(--font-mono);white-space:pre-wrap;max-height:320px;overflow-y:auto;word-break:break-word}
+.send-to-chat{width:100%;padding:9px;border-radius:var(--border-radius-md);border:0.5px solid #5DCAA5;background:#E1F5EE;color:#0F6E56;font-size:13px;font-weight:500;cursor:pointer}
+.send-to-chat:hover{background:#9FE1CB}
+.progress-wrap{display:none;padding:1rem;text-align:center}
+.progress-bar{width:100%;height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.progress-fill{height:100%;background:#7F77DD;border-radius:3px;transition:width .3s}
+.progress-label{font-size:12px;color:var(--color-text-secondary)}
+.ocr-info{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);padding:8px 12px;border-radius:var(--border-radius-md);margin-bottom:1rem;line-height:1.6}
+</style>
+
+<div id="app">
+  <h1>🧠 NeuroLearn AI</h1>
+  <p class="sub">Study assistant + OCR — works fully offline</p>
+  <div class="offline-badge"><div class="dot-g"></div> Offline mode — no internet needed</div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('chat',this)">💬 Study Chatbot</div>
+    <div class="tab" onclick="switchTab('ocr',this)">📄 OCR — Extract Text</div>
+  </div>
+
+  <!-- CHAT PANEL -->
+  <div class="panel active" id="panel-chat">
+    <div class="mpills">
+      <div class="mp on" onclick="setMode(this,'explain')">📘 Explain</div>
+      <div class="mp" onclick="setMode(this,'math')">🔢 Math</div>
+      <div class="mp" onclick="setMode(this,'quiz')">🎯 Quiz</div>
+      <div class="mp" onclick="setMode(this,'notes')">📄 Clean notes</div>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="fireQ('What is photosynthesis?')">Photosynthesis</span>
+      <span class="chip" onclick="fireQ('What is gravity?')">Gravity</span>
+      <span class="chip" onclick="fireQ('What is democracy?')">Democracy</span>
+      <span class="chip" onclick="fireQ('Solve 2x + 5 = 15')">Solve 2x+5=15</span>
+      <span class="chip" onclick="fireQ('Explain Newton first law')">Newton's law</span>
+      <span class="chip" onclick="fireQ('What is mitosis?')">Mitosis</span>
+      <span class="chip" onclick="fireQ('What is the water cycle?')">Water cycle</span>
+      <span class="chip" onclick="fireQ('Quiz me on photosynthesis')">Quiz: photosynthesis</span>
+    </div>
+    <div class="chat-box" id="chatBox">
+      <div class="msg ai">👋 Hi! I am NeuroLearn AI — working fully offline!\n\nAsk me anything. I will explain it simply, step by step. 🌟</div>
+    </div>
+    <p class="hint">Press Enter to send • Shift+Enter for new line</p>
+    <div class="irow">
+      <textarea id="chatQ" placeholder="Type your question here…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+      <button class="sbtn" onclick="sendChat()">Ask ↗</button>
+    </div>
+  </div>
+
+  <!-- OCR PANEL -->
+  <div class="panel" id="panel-ocr">
+    <div class="ocr-info">📌 OCR uses your browser's built-in text recognition (Tesseract.js). Works fully offline after first load. Best with clear, printed text.</div>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('imgInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+      <div class="dico">🖼️</div>
+      <p>Click to upload or drag & drop image</p>
+      <small>JPG · PNG · WEBP · BMP</small>
+    </div>
+    <input type="file" id="imgInput" accept="image/*" onchange="loadImg(event)">
+    <div class="prev-wrap" id="prevWrap">
+      <img id="prevImg" src="" alt="preview">
+      <div class="prev-bar">
+        <span id="prevName">image.jpg</span>
+        <button onclick="clearImg()">✕ Remove</button>
+      </div>
+    </div>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">Loading OCR engine…</div>
+    </div>
+    <button class="ocr-btn" id="ocrBtn" onclick="runOCR()" disabled>📋 Extract text from image</button>
+    <div class="result-wrap" id="resultWrap">
+      <div class="result-head">
+        <span>✅ Extracted text</span>
+        <button onclick="copyOCR()">Copy</button>
+      </div>
+      <div class="result-body" id="resultBody"></div>
+    </div>
+    <button class="send-to-chat" id="sendToChatBtn" style="display:none" onclick="sendOCRToChat()">💬 Send to chatbot to explain</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+// ========== KNOWLEDGE BASE ==========
+const KB = {
+  photosynthesis:{
+    topic:"Photosynthesis",
+    explain:"Plants make their own food using sunlight.\nThey take in water from soil and carbon dioxide from air.\nThis process also produces oxygen for us to breathe.",
+    steps:["Leaves absorb SUNLIGHT through chlorophyll","Roots absorb WATER from the soil","Leaves take in CARBON DIOXIDE from air","These combine to make GLUCOSE (food) and OXYGEN"],
+    example:"A mango tree sits in sunlight all day. It makes food and grows mangoes while giving you fresh oxygen!",
+    points:["Plants need SUNLIGHT, WATER, and CARBON DIOXIDE","They produce GLUCOSE (food) and OXYGEN","This happens inside CHLOROPLASTS in leaves","CHLOROPHYLL gives leaves their green colour"]
+  },
+  gravity:{
+    topic:"Gravity",
+    explain:"Gravity is a force that pulls objects toward Earth.\nEvery object with mass pulls other objects toward it.\nThe bigger the object, the stronger its gravity.",
+    steps:["Earth has a very large mass","This mass creates a pulling force","Everything near Earth gets pulled toward its centre","The force gets weaker as you move farther away"],
+    example:"An apple falls from a tree straight down to the ground — that is gravity pulling it!",
+    points:["Gravity pulls objects toward Earth","It acts on ALL objects everywhere","Gravity keeps the Moon orbiting Earth","Without gravity we would float into space"]
+  },
+  newton:{
+    topic:"Newton's First Law of Motion",
+    explain:"An object at rest stays still unless a force moves it.\nA moving object keeps moving unless a force stops it.\nThis is called the Law of INERTIA.",
+    steps:["Imagine a ball sitting on the floor","It will not move by itself","You must push or kick it to make it move","Once moving, it keeps going until friction stops it"],
+    example:"When a bus stops suddenly, you jerk forward. Your body was moving and wanted to keep moving!",
+    points:["Still objects stay still without a force","Moving objects keep moving without a force","INERTIA is the tendency to resist change","FORCE is needed to change an object's motion"]
+  },
+  democracy:{
+    topic:"Democracy",
+    explain:"Democracy is a system where people choose their leaders.\nEveryone gets a vote — one person, one vote.\nThe leader with the most votes wins and governs.",
+    steps:["Citizens register to vote","An election is held on a chosen day","People vote for the leader they want","Votes are counted and the winner is announced"],
+    example:"In India, every adult votes to choose the Prime Minister. Millions of people decide together!",
+    points:["DEMOCRACY means power belongs to the people","Everyone gets one equal vote","Leaders are chosen through FREE and FAIR elections","Citizens can remove bad leaders at the next election"]
+  },
+  mitosis:{
+    topic:"Mitosis (Cell Division)",
+    explain:"Mitosis is how one cell divides into two cells.\nBoth new cells are exact copies of the original.\nThis is how your body grows and repairs itself.",
+    steps:["Cell copies all its DNA (INTERPHASE)","Chromosomes line up in the middle (METAPHASE)","Chromosomes are pulled to opposite sides (ANAPHASE)","Cell splits into two identical daughter cells (TELOPHASE)"],
+    example:"When you get a cut, mitosis makes new skin cells to heal it. Your body makes millions of new cells every day!",
+    points:["MITOSIS produces 2 identical daughter cells","It is used for GROWTH and REPAIR","Each new cell has the same number of chromosomes","The 4 stages are: Prophase, Metaphase, Anaphase, Telophase"]
+  },
+  watercycle:{
+    topic:"The Water Cycle",
+    explain:"Water moves continuously between land, ocean, and sky.\nThe sun heats water which rises as vapour.\nIt then cools, forms clouds, and falls as rain.",
+    steps:["Sun heats water in oceans and rivers (EVAPORATION)","Water vapour rises into the sky","Vapour cools and forms clouds (CONDENSATION)","Water falls back as rain or snow (PRECIPITATION)"],
+    example:"On a hot day, puddles disappear — the water evaporated! Later it returns as rain somewhere else.",
+    points:["Water never disappears — it just changes form","EVAPORATION turns liquid water into vapour","CONDENSATION turns vapour into clouds","PRECIPITATION brings water back as rain or snow"]
+  },
+  heart:{
+    topic:"How the Heart Works",
+    explain:"The heart is a muscle that pumps blood around your body.\nIt beats about 70 times every minute.\nBlood carries oxygen and nutrients to all your organs.",
+    steps:["Blood enters the heart from the body","The right side pumps blood to the LUNGS for oxygen","Oxygen-rich blood returns to the left side","The left side pumps it to the entire body"],
+    example:"Put your hand on your chest — feel that beat? Every beat pumps blood to your brain, muscles, and organs!",
+    points:["The heart has 4 CHAMBERS: 2 atria and 2 ventricles","Right side pumps to LUNGS, left side to BODY","Heart beats ~70 times per minute (100,000 times a day!)","VALVES stop blood from flowing backwards"]
+  }
+};
+
+// ========== MATH ENGINE ==========
+function solveMath(q){
+  q=q.toLowerCase();
+  // Linear: ax + b = c
+  let m=q.match(/(-?\d*)\s*x\s*([+-]\s*\d+)?\s*=\s*(-?\d+)/);
+  if(m){
+    let a=parseInt(m[1]||'1')||1, b=parseInt((m[2]||'0').replace(/\s/g,''))||0, c=parseInt(m[3]);
+    let x=(c-b)/a;
+    return `📘 Topic: Solving Linear Equation\n🧠 Simple Explanation:\nWe need to find the value of x.\nWe move numbers to one side.\nThen divide to find x.\n\n🔍 Step-by-Step:\n1. Start with: ${m[0].trim()}\n2. Move ${b} to right side: ${a}x = ${c-b}\n3. Divide both sides by ${a}: x = ${(c-b)}÷${a}\n\n✅ Final Answer: x = ${x}\n\n💡 Example:\nIf x = ${x}, check: ${a}(${x}) + ${b} = ${a*x+b} ✓\n\n🎯 Key Points:\n- Move numbers away from x first\n- What you do to one side, do to the other\n- Always check your answer!`;
+  }
+  // Basic arithmetic
+  try{
+    let expr=q.replace(/[^0-9+\-*/().% ]/g,'').trim();
+    if(expr){let r=Function('"use strict";return ('+expr+')')();return `📘 Topic: Arithmetic\n🧠 Simple Explanation:\nLet me calculate this for you.\n\n🔍 Step-by-Step:\n1. Expression: ${expr}\n2. Calculate step by step\n3. Get the final answer\n\n✅ Final Answer: ${expr} = ${Math.round(r*10000)/10000}\n\n🎯 Key Points:\n- Always follow BODMAS/PEMDAS order\n- Brackets first, then division/multiplication, then addition/subtraction`;}
+  }catch(e){}
+  return null;
+}
+
+// ========== QUIZ ENGINE ==========
+const quizzes={
+  photosynthesis:[
+    {q:"What do plants use to make food?",opts:["A) Only water","B) Sunlight, water and CO₂","C) Soil and rain","D) Oxygen and glucose"],ans:"B",exp:"Plants need all three: sunlight for energy, water from roots, CO₂ from air."},
+    {q:"What gas do plants produce during photosynthesis?",opts:["A) Carbon dioxide","B) Nitrogen","C) Oxygen","D) Hydrogen"],ans:"C",exp:"Oxygen is released as a byproduct — this is the air we breathe!"},
+    {q:"Where does photosynthesis happen in a plant?",opts:["A) Roots","B) Stem","C) Flowers","D) Chloroplasts in leaves"],ans:"D",exp:"Chloroplasts contain chlorophyll which captures sunlight."},
+    {q:"What gives leaves their green colour?",opts:["A) Glucose","B) Chlorophyll","C) Water","D) Oxygen"],ans:"B",exp:"Chlorophyll is the green pigment that absorbs sunlight."}
+  ],
+  watercycle:[
+    {q:"What is the process where water turns into vapour?",opts:["A) Condensation","B) Precipitation","C) Evaporation","D) Collection"],ans:"C",exp:"Evaporation happens when the sun heats water and turns it into vapour."},
+    {q:"What is it called when water vapour turns into clouds?",opts:["A) Evaporation","B) Condensation","C) Precipitation","D) Transpiration"],ans:"B",exp:"Condensation happens when water vapour cools and forms tiny droplets."},
+    {q:"What is precipitation?",opts:["A) Water evaporating","B) Clouds forming","C) Rain, snow or hail falling","D) Water soaking into ground"],ans:"C",exp:"Precipitation is any form of water falling from clouds."},
+    {q:"What powers the water cycle?",opts:["A) Wind","B) The Moon","C) The Sun","D) Gravity only"],ans:"C",exp:"The Sun's heat drives evaporation which starts the whole cycle."}
+  ]
+};
+
+function makeQuiz(topic){
+  let key=Object.keys(quizzes).find(k=>topic.toLowerCase().includes(k));
+  if(!key)return `📘 Topic: Quiz\n\n🎯 I have quizzes for: photosynthesis, water cycle.\n\nFor other topics, type your question in the chat and I will explain it clearly!`;
+  let qs=quizzes[key];
+  let out=`📘 Topic: Quiz on ${key.charAt(0).toUpperCase()+key.slice(1)}\n\n`;
+  qs.forEach((q,i)=>{
+    out+=`Q${i+1}. ${q.q}\n${q.opts.join('\n')}\n✅ Answer: ${q.ans} — ${q.exp}\n\n`;
+  });
+  out+=`🎯 Study tip: Read each question carefully before picking your answer!`;
+  return out;
+}
+
+// ========== MAIN RESPONSE ENGINE ==========
+function getResponse(q,mode){
+  const ql=q.toLowerCase();
+
+  if(mode==='quiz'||ql.startsWith('quiz')){
+    return makeQuiz(ql);
+  }
+
+  if(mode==='math'||ql.match(/solve|calculate|find x|equation|\d+x|\d+\s*[+\-*/]\s*\d/)){
+    let r=solveMath(ql);
+    if(r)return r;
+  }
+
+  if(mode==='notes'||ql.length>120){
+    return `📘 Topic: Your Notes\n🧠 Simple Explanation:\nHere are your cleaned and structured notes.\nI have organised them clearly for you.\nKey terms are highlighted.\n\n🔍 Step-by-Step:\n1. Read the KEY TERMS first\n2. Understand each concept one by one\n3. Try to explain it in your own words\n\n💡 Your notes say:\n${q.trim()}\n\n🎯 Key Points:\n- Review these notes daily for best results\n- Try writing them again from memory\n- Ask me to quiz you when you are ready!`;
+  }
+
+  // Match knowledge base
+  let match=null;
+  if(ql.includes('photosynthesis'))match=KB.photosynthesis;
+  else if(ql.includes('gravity'))match=KB.gravity;
+  else if(ql.includes('newton'))match=KB.newton;
+  else if(ql.includes('democracy'))match=KB.democracy;
+  else if(ql.includes('mitosis')||ql.includes('cell division'))match=KB.mitosis;
+  else if(ql.includes('water cycle')||ql.includes('watercycle'))match=KB.watercycle;
+  else if(ql.includes('heart'))match=KB.heart;
+
+  if(match){
+    return `📘 Topic: ${match.topic}\n\n🧠 Simple Explanation:\n${match.explain}\n\n🔍 Step-by-Step:\n${match.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\n💡 Example:\n${match.example}\n\n🎯 Key Points:\n${match.points.map(p=>`- ${p}`).join('\n')}\n\nYou are doing great! Keep asking questions 🌟`;
+  }
+
+  // Generic fallback
+  const words=q.trim().split(' ').slice(0,4).join(' ');
+  return `📘 Topic: ${words}\n\n🧠 Simple Explanation:\nThis is a great question!\nI will give you the key ideas.\nRemember: every big concept has simple steps.\n\n🔍 Step-by-Step:\n1. Break the topic into small parts\n2. Learn one part at a time\n3. Connect the parts together\n4. Practice by explaining it to someone\n\n💡 Example:\nThink of learning to ride a bike — you learn balance first, then pedalling, then steering!\n\n🎯 Key Points:\n- Start with the basic definition\n- Ask WHY and HOW questions\n- Repeat what you learned in your own words\n\n💡 Tip: I have built-in answers for photosynthesis, gravity, Newton's laws, democracy, mitosis, water cycle, and heart. Ask about those for a full explanation!`;
+}
+
+// ========== CHAT UI ==========
+let mode='explain';
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('panel-'+n).classList.add('active')}
+function setMode(el,m){mode=m;document.querySelectorAll('.mp').forEach(p=>p.classList.remove('on'));el.classList.add('on')}
+function fireQ(q){document.getElementById('chatQ').value=q;sendChat()}
+
+function sendChat(){
+  const input=document.getElementById('chatQ');
+  const q=input.value.trim();
+  if(!q)return;
+  input.value='';
+  addMsg(q,'user');
+  setTimeout(()=>{
+    const r=getResponse(q,mode);
+    addMsg(r,'ai');
+  },300);
+}
+
+let mid=0;
+function addMsg(text,type){
+  const box=document.getElementById('chatBox');
+  const d=document.createElement('div');
+  d.className='msg '+type;
+  d.textContent=text;
+  box.appendChild(d);
+  box.scrollTop=box.scrollHeight;
+}
+
+// ========== OCR ==========
+let imgB64=null,ocrText='';
+function onDrag(e,on){e.preventDefault();document.getElementById('dropZone').classList.toggle('drag',on)}
+function onDrop(e){e.preventDefault();onDrag(e,false);const f=e.dataTransfer.files[0];if(f)loadImgFile(f)}
+function loadImg(e){const f=e.target.files[0];if(f)loadImgFile(f)}
+function loadImgFile(f){
+  const r=new FileReader();
+  r.onload=ev=>{
+    imgB64=ev.target.result;
+    document.getElementById('prevImg').src=ev.target.result;
+    document.getElementById('prevName').textContent=f.name;
+    document.getElementById('prevWrap').style.display='block';
+    document.getElementById('ocrBtn').disabled=false;
+    document.getElementById('dropZone').style.display='none';
+  };
+  r.readAsDataURL(f);
+}
+function clearImg(){
+  imgB64=null;
+  document.getElementById('prevWrap').style.display='none';
+  document.getElementById('prevImg').src='';
+  document.getElementById('imgInput').value='';
+  document.getElementById('ocrBtn').disabled=true;
+  document.getElementById('dropZone').style.display='block';
+  document.getElementById('resultWrap').style.display='none';
+  document.getElementById('sendToChatBtn').style.display='none';
+  document.getElementById('progressWrap').style.display='none';
+}
+
+async function runOCR(){
+  if(!imgB64)return;
+  const btn=document.getElementById('ocrBtn');
+  const pw=document.getElementById('progressWrap');
+  const pf=document.getElementById('progressFill');
+  const pl=document.getElementById('progressLabel');
+  btn.disabled=true;
+  pw.style.display='block';
+  document.getElementById('resultWrap').style.display='none';
+  document.getElementById('sendToChatBtn').style.display='none';
+
+  try{
+    const result=await Tesseract.recognize(imgB64,'eng',{
+      logger:m=>{
+        if(m.status==='recognizing text'){
+          pf.style.width=Math.round(m.progress*100)+'%';
+          pl.textContent='Recognizing text… '+Math.round(m.progress*100)+'%';
+        } else {
+          pl.textContent=m.status+'…';
+        }
+      }
+    });
+    ocrText=result.data.text.trim()||'No text found in image.';
+    pw.style.display='none';
+    document.getElementById('resultBody').textContent=ocrText;
+    document.getElementById('resultWrap').style.display='block';
+    document.getElementById('sendToChatBtn').style.display='block';
+  }catch(e){
+    pw.style.display='none';
+    document.getElementById('resultBody').textContent='❌ OCR failed: '+e.message;
+    document.getElementById('resultWrap').style.display='block';
+  }
+  btn.disabled=false;
+}
+
+function copyOCR(){
+  navigator.clipboard.writeText(ocrText).then(()=>{
+    const b=document.querySelector('.result-head button');
+    b.textContent='Copied!';
+    setTimeout(()=>b.textContent='Copy',1500);
+  });
+}
+
+function sendOCRToChat(){
+  if(!ocrText)return;
+  switchTab('chat',document.querySelectorAll('.tab')[0]);
+  document.getElementById('chatQ').value=ocrText.slice(0,300);
+  addMsg('Sending OCR text to chatbot…','ai');
+  setTimeout(()=>{
+    const r=getResponse(ocrText,'notes');
+    addMsg(r,'ai');
+  },400);
+}
+</script>
