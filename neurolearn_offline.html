@@ -7,8 +7,10 @@ h1{font-size:21px;font-weight:500;color:var(--color-text-primary);text-align:cen
 .offline-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459;margin:0 auto 1rem;display:flex;width:fit-content}
 .dot-g{width:7px;height:7px;border-radius:50%;background:#639922}
 .tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.25rem}
-.tab{padding:9px 20px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px;user-select:none}
+.tab{padding:9px 20px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px;user-select:none;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;line-height:inherit}
 .tab.active{color:#534AB7;border-bottom-color:#534AB7;font-weight:500}
+.tab:focus{outline:none}
+.tab:focus-visible{outline:2px solid #534AB7;outline-offset:2px}
 .panel{display:none}.panel.active{display:block}
 .mpills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
 .mp{font-size:12px;padding:5px 13px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;user-select:none}
@@ -59,13 +61,13 @@ h1{font-size:21px;font-weight:500;color:var(--color-text-primary);text-align:cen
   <p class="sub">Study assistant + OCR — works fully offline</p>
   <div class="offline-badge"><div class="dot-g"></div> Offline mode — no internet needed</div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('chat',this)">💬 Study Chatbot</div>
-    <div class="tab" onclick="switchTab('ocr',this)">📄 OCR — Extract Text</div>
+  <div class="tabs" role="tablist" aria-label="NeuroLearn sections">
+    <button type="button" class="tab active" role="tab" id="tab-chat" aria-selected="true" aria-controls="panel-chat" onclick="switchTab('chat',this)">💬 Study Chatbot</button>
+    <button type="button" class="tab" role="tab" id="tab-ocr" aria-selected="false" aria-controls="panel-ocr" tabindex="-1" onclick="switchTab('ocr',this)">📄 OCR — Extract Text</button>
   </div>
 
   <!-- CHAT PANEL -->
-  <div class="panel active" id="panel-chat">
+  <div class="panel active" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat">
     <div class="mpills">
       <div class="mp on" onclick="setMode(this,'explain')">📘 Explain</div>
       <div class="mp" onclick="setMode(this,'math')">🔢 Math</div>
@@ -93,7 +95,7 @@ h1{font-size:21px;font-weight:500;color:var(--color-text-primary);text-align:cen
   </div>
 
   <!-- OCR PANEL -->
-  <div class="panel" id="panel-ocr">
+  <div class="panel" id="panel-ocr" role="tabpanel" aria-labelledby="tab-ocr" hidden>
     <div class="ocr-info">📌 OCR uses your browser's built-in text recognition (Tesseract.js). Works fully offline after first load. Best with clear, printed text.</div>
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('imgInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
       <div class="dico">🖼️</div>
@@ -263,7 +265,23 @@ function getResponse(q,mode){
 
 // ========== CHAT UI ==========
 let mode='explain';
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('panel-'+n).classList.add('active')}
+function switchTab(n,el){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.remove('active');
+    t.setAttribute('aria-selected','false');
+    t.setAttribute('tabindex','-1');
+  });
+  document.querySelectorAll('.panel').forEach(p=>{
+    p.classList.remove('active');
+    p.setAttribute('hidden','');
+  });
+  el.classList.add('active');
+  el.setAttribute('aria-selected','true');
+  el.setAttribute('tabindex','0');
+  const panel=document.getElementById('panel-'+n);
+  panel.classList.add('active');
+  panel.removeAttribute('hidden');
+}
 function setMode(el,m){mode=m;document.querySelectorAll('.mp').forEach(p=>p.classList.remove('on'));el.classList.add('on')}
 function fireQ(q){document.getElementById('chatQ').value=q;sendChat()}
 
